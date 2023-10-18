@@ -1,7 +1,7 @@
 from httpobs.conf import API_ALLOW_VERBOSE_STATS_FROM_PUBLIC, API_COOLDOWN
-from httpobs.scanner import STATES
-from httpobs.scanner.grader import get_score_description, GRADES
-from httpobs.scanner.utils import valid_hostname
+# from httpobs.scanner import STATES
+# from httpobs.scanner.grader import get_score_description, GRADES
+from httpobs.website.utils import valid_hostname
 from httpobs.website import add_response_headers, sanitized_api_response
 
 from flask import Blueprint, jsonify, make_response, request
@@ -10,6 +10,10 @@ from werkzeug.http import http_date
 import httpobs.database as database
 import json
 import os.path
+import requests
+
+STATES = []
+GRADES = []
 
 
 api = Blueprint('api', __name__)
@@ -65,6 +69,11 @@ def api_post_scan_hostname():
         # Begin the dispatch process if it was a POST
         if request.method == 'POST':
             row = database.insert_scan(site_id, hidden=hidden)
+
+            r = requests.get("http://scanner:8080", params={"hostname": hostname})
+            data = r.json()
+
+            row = database.insert_test_results(site_id, row["id"], data)
         else:
             return {
                 'error': 'recent-scan-not-found',
@@ -239,8 +248,8 @@ def api_get_scan_results():
     tests = dict(database.select_test_results(scan_id))
 
     # For each test, get the test score description and add that in
-    for test in tests:
-        tests[test]['score_description'] = get_score_description(tests[test]['result'])
+    # for test in tests:
+    #     tests[test]['score_description'] = get_score_description(tests[test]['result'])
 
     return tests
 

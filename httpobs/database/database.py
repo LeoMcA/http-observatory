@@ -12,20 +12,24 @@ from httpobs.conf import (API_CACHED_RESULT_TIME,
                           DATABASE_SSL_MODE,
                           DATABASE_USER,
                           SCANNER_ABORT_SCAN_TIME)
-from httpobs.scanner import (ALGORITHM_VERSION,
-                             STATE_ABORTED,
-                             STATE_FAILED,
-                             STATE_FINISHED,
-                             STATE_PENDING,
-                             STATE_STARTING)
-from httpobs.scanner.analyzer import NUM_TESTS
-from httpobs.scanner.grader import get_grade_and_likelihood_for_score, MINIMUM_SCORE_FOR_EXTRA_CREDIT
 
 import psycopg2
 import psycopg2.extras
 import psycopg2.pool
 import sys
 
+# Current algorithm version
+ALGORITHM_VERSION = 2
+
+# The various statuses
+STATE_ABORTED = 'ABORTED'
+STATE_FAILED = 'FAILED'
+STATE_FINISHED = 'FINISHED'
+STATE_PENDING = 'PENDING'
+STATE_STARTING = 'STARTING'
+STATE_RUNNING = 'RUNNING'
+
+NUM_TESTS = 12
 
 class SimpleDatabaseConnection:
     def __init__(self):
@@ -122,41 +126,28 @@ def insert_scan_grade(scan_id, scan_grade, scan_score) -> dict:
 # TODO: Separate out some of this logic so it doesn't need to be duplicated in local.scan()
 def insert_test_results(site_id: int,
                         scan_id: int,
-                        tests: list,
-                        response_headers: dict,
-                        status_code: int = None) -> dict:
+                        data: dict) -> dict:
     with get_cursor() as cur:
-        tests_failed = tests_passed = 0
-        score_with_extra_credit = uncurved_score = 100
-
-        for test in tests:
+        for test in data["tests"]:
             name = test.pop('name')
             expectation = test.pop('expectation')
             passed = test.pop('pass')
             result = test.pop('result')
             score_modifier = test.pop('score_modifier')
 
-            # Keep track of how many tests passed or failed
-            if passed:
-                tests_passed += 1
-            else:
-                tests_failed += 1
-
-            # And keep track of the score
-            score_with_extra_credit += score_modifier
-            if score_modifier < 0:
-                uncurved_score += score_modifier
-
             # Insert test result to the database
             cur.execute("""INSERT INTO tests (site_id, scan_id, name, expectation, result, pass, output, score_modifier)
                              VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
                         (site_id, scan_id, name, expectation, result, passed, dumps(test), score_modifier))
 
-        # Only record the full score if the uncurved score already receives an A
-        score = score_with_extra_credit if uncurved_score >= MINIMUM_SCORE_FOR_EXTRA_CREDIT else uncurved_score
-
-        # Now we need to update the scans table
-        score, grade, likelihood_indicator = get_grade_and_likelihood_for_score(score)
+        scan = data["scan"]
+        tests_failed = scan["tests_failed"]
+        tests_passed = scan["tests_passed"]
+        grade = scan["grade"]
+        score = scan["score"]
+        likelihood_indicator = scan["likelihood_indicator"]
+        response_headers = scan["response_headers"]
+        status_code = scan["status_code"]
 
         # Update the scans table
         cur.execute("""UPDATE scans

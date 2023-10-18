@@ -2,9 +2,9 @@ from operator import itemgetter
 from typing import Dict, Set
 from urllib.parse import urlparse, urlunparse
 
-from httpobs.scanner.analyzer.decorators import scored_test
-from httpobs.scanner.analyzer.utils import is_hpkp_preloaded, is_hsts_preloaded, only_if_worse
-from httpobs.scanner.retriever import get_duplicate_header_values
+from analyzer.decorators import scored_test
+from analyzer.utils import is_hpkp_preloaded, is_hsts_preloaded, only_if_worse
+from retriever import get_duplicate_header_values
 
 
 # Ignore the CloudFlare __cfduid tracking cookies. They *are* actually bad, but it is out of a site's

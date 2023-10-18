@@ -4,7 +4,7 @@ import os.path
 
 # Load the HSTS list from disk
 __dirname = os.path.abspath(os.path.dirname(__file__))
-__filename = os.path.join(__dirname, '..', '..', 'conf', 'hsts-preload.json')
+__filename = os.path.join(__dirname, '..', 'conf', 'hsts-preload.json')
 
 with open(__filename, 'r') as f:
     hsts = json.load(f)

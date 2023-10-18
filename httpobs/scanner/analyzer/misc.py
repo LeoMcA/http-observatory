@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse
 
-from httpobs.scanner.analyzer.decorators import scored_test
-from httpobs.scanner.analyzer.utils import is_hsts_preloaded
+from analyzer.decorators import scored_test
+from analyzer.utils import is_hsts_preloaded
 
 
 def __parse_acao_xml_get_domains(xml, type='crossdomain') -> list:

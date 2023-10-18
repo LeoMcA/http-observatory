@@ -2,10 +2,10 @@ from bs4 import BeautifulSoup as bs
 from publicsuffixlist import PublicSuffixList
 from urllib.parse import urlparse
 
-from httpobs.conf import SCANNER_MOZILLA_DOMAINS
-from httpobs.scanner.analyzer.decorators import scored_test
-from httpobs.scanner.analyzer.utils import only_if_worse
-from httpobs.scanner.retriever.retriever import HTML_TYPES
+from conf import SCANNER_MOZILLA_DOMAINS
+from analyzer.decorators import scored_test
+from analyzer.utils import only_if_worse
+from retriever.retriever import HTML_TYPES
 
 
 import json

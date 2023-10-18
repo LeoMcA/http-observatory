@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "httpobs"
+name = "http-observatory-scanner"
 version = "0.9.3"
 description = "HTTP Observatory: a set of tests and tools to scan your website for basic web hygeine."
 license = "MPL-2.0"
@@ -8,15 +8,10 @@ maintainers = ["Leo McArdle <leo@mozilla.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-coverage = "^7.3.2"
-flake8 = "^6.1.0"
-# httpobs-cli = "^1.0.2"
-pynose = "^1.4.8"
-pep8 = "^1.7.1"
-psycopg2 = "^2.9.9"
+beautifulsoup4 = "^4.12.2"
+publicsuffixlist = "^0.10.0.20231002"
 requests = "^2.31.0"
-Flask = "^3.0.0"
-uWSGI = "^2.0.22"
+functions-framework = "^3.4.0"
 
 [build-system]
 requires = ["poetry-core"]

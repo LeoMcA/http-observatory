@@ -1,6 +1,6 @@
 from functools import wraps
 
-from httpobs.scanner.grader import get_score_modifier
+from grader import get_score_modifier
 
 
 def scored_test(func):

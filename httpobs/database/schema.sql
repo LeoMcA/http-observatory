@@ -78,6 +78,12 @@ GRANT USAGE ON SEQUENCE sites_id_seq TO httpobsapi;
 GRANT USAGE ON SEQUENCE scans_id_seq TO httpobsapi;
 GRANT USAGE ON SEQUENCE expectations_id_seq TO httpobsapi;
 
+GRANT SELECT on sites, scans, expectations, tests TO httpobsapi;
+GRANT UPDATE (domain) ON sites to httpobsapi;  /* TODO: there's got to be a better way with SELECT ... FOR UPDATE */
+GRANT UPDATE on scans TO httpobsapi;
+GRANT INSERT on tests TO httpobsapi;
+GRANT USAGE ON SEQUENCE tests_id_seq TO httpobsapi;
+
 CREATE INDEX scans_site_id_finished_state_end_time_idx ON scans (site_id, state, end_time DESC) WHERE state = 'FINISHED';
 
 CREATE MATERIALIZED VIEW latest_scans

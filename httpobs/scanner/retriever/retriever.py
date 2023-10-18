@@ -1,11 +1,10 @@
-from celery.exceptions import SoftTimeLimitExceeded, TimeLimitExceeded
 from urllib.parse import urlparse
 
-from httpobs.conf import (RETRIEVER_CONNECT_TIMEOUT,
+from conf import (RETRIEVER_CONNECT_TIMEOUT,
                           RETRIEVER_CORS_ORIGIN,
                           RETRIEVER_READ_TIMEOUT,
                           RETRIEVER_USER_AGENT)
-from httpobs.scanner.utils import parse_http_equiv_headers
+from utils import parse_http_equiv_headers
 
 import logging
 import requests
@@ -61,9 +60,6 @@ def __create_session(url: str, **kwargs) -> dict:
 
         # No tls errors
         r.verified = True
-    # Let celery exceptions percolate upward
-    except (SoftTimeLimitExceeded, TimeLimitExceeded):
-        raise
     # We can try again if there's an SSL error, making sure to note it in the session
     except requests.exceptions.SSLError:
         try:
@@ -102,9 +98,6 @@ def __get(session, relative_path='/', headers=None, cookies=None):
                            headers=headers,
                            cookies=cookies,
                            timeout=TIMEOUT)
-    # Let celery exceptions percolate upward
-    except (SoftTimeLimitExceeded, TimeLimitExceeded):
-        raise
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
